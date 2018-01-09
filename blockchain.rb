@@ -35,6 +35,14 @@ class Blockchain
     chain.length
   end
 
+  def proof_of_work(last_proof)
+    proof = 0
+    while !valid_prrof?
+      proof += 1
+    end
+    proof
+  end
+
   private
 
   # Returns the last Block in the chain
@@ -42,10 +50,17 @@ class Blockchain
     chain.last
   end
 
+  # Validates the Proof: Does hash(last_proof, proof) contain 4 leading zeroes?
+  def valid_proof?(last_proof, proof)
+    guess = "#{last_proof}#{proof}".encode
+    guess_hash = Digest::MD5.hexdigest(guess)
+    guess_hash[0..3] == "0000"
+  end
+
   # Hashes a Block
   def self.hash(block)
     # We must make sure that the Dictionary is Ordered, or we'll have inconsistent hashes
-    block_string = block.sort.to_h.to_json
+    block_string = block.sort.to_h.to_json.encode
     Digest::MD5.hexdigest(block_string)
   end
 end
