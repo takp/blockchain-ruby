@@ -1,11 +1,15 @@
 require 'json'
 require 'digest/md5'
+require 'sinatra'
+require 'securerandom'
 
 class Blockchain
+  attr_accessor :chain, :current_transactions
   def initialize
-    self.chain = []
-    self.current_transactions = []
-    self.new_block(1, 100)
+    @chain = []
+    @current_transactions = []
+    # Create the genesis block
+    new_block(1, 100)
   end
   
   # Creates a new Block and adds it to the chain
@@ -63,4 +67,26 @@ class Blockchain
     block_string = block.sort.to_h.to_json.encode
     Digest::MD5.hexdigest(block_string)
   end
+end
+
+# Generate a globally unique address for this node
+node_identifier = SecureRandom.uuid.gsub("-", "")
+
+# Instantiate the Blockchain
+blockchain = Blockchain.new
+
+get '/mine' do
+  "We'll mine a new Block"
+end
+
+post '/transactions/new' do
+  "We'll add a new transaction"
+end
+
+get '/chain' do
+  response = {
+    chain:  blockchain.chain,
+    length: blockchain.chain.length
+  }
+  response.to_json
 end
